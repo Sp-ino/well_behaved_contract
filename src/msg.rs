@@ -10,12 +10,12 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize)]
 pub struct GreetResp {
-    greeting: String,
+    pub greeting: String,
 }
 
 
 
 #[derive(Serialize, Deserialize)]
 pub struct GoodbyeResp {
-    goodbye: String,
+    pub goodbye: String,
 }

@@ -26,11 +26,23 @@ pub fn query(
 ) -> StdResult<Binary> {
 
     match msg {
-        QueryMsg::Greet(greeting) => to_binary(&)
+        QueryMsg::Greet(grtng) => {
+            let greetresp = GreetResp {
+                greeting: grtng.to_owned(),
+            };
+            to_binary(&greetresp)
+        },
+        QueryMsg::Goodbye(gbye) => {
+            let goodbyeresp = GoodbyeResp {
+                goodbye: gbye.to_owned(),
+            };
+            to_binary(&goodbyeresp)
+        },
     }
-
 }
 
 
 
-pub fn greet()
+pub fn greet() {
+
+}
