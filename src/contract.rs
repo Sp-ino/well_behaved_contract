@@ -20,7 +20,7 @@ pub fn instantiate(
 
 #[entry_point]
 pub fn query(
-    _deps: DepsMut,
+    _deps: Deps,
     _env: Env,
     msg: QueryMsg,
 ) -> StdResult<Binary> {
