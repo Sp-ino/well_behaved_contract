@@ -14,7 +14,9 @@ pub enum QueryMsg {
     // Represents a message that triggers
     // execution of the contract's query()
     // entry point function
-    Greet(String),
+    Greet(String), // question: do I have to use struct representation
+                    // for the variant's content (e.g. Greet{ greeting: String })
+                    // or will the variant be serialized correctly anyways?
     Goodbye(String),
 }
 
