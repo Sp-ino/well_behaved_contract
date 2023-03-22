@@ -28,21 +28,26 @@ pub fn instantiate(
 
 #[entry_point]
 pub fn execute(
-    _deps: DepsMut,
+    deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: ExecuteMsg,
 ) -> StdResult<Response> {
-    
     match msg {
-        ExecuteMsg::AddUser{username: un} => add_user(un),
+        ExecuteMsg::AddUser{username: un} => add_user(un, deps, info),
         ExecuteMsg::Leave{} => leave(),
     }
 }
 
 
 
-pub fn add_user(_username: String) -> StdResult<Response> {
+pub fn add_user(username: String, deps: DepsMut, _info: MessageInfo) -> StdResult<Response> {
+    let new_user_addr = deps.api.addr_validate(&username)?;
+
+    let mut users = USERS.load(deps.storage)?;
+    users.push(new_user_addr);
+    
+    USERS.save(deps.storage, &users)?;
 
     Ok(Response::new())
 }
