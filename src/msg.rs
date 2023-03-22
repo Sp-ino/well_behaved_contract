@@ -8,16 +8,22 @@ pub struct InstantiateMsg {
 
 
 
+pub enum  ExecuteMsg {
+    AddUser{ username: String },
+    Leave{},
+}
+
+
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum QueryMsg {
     // Represents a message that triggers
     // execution of the contract's query()
     // entry point function
-    Greet(String), // question: do I have to use struct representation
+    Greet{ greeting: String }, // question: do I have to use struct representation
                     // for the variant's content (e.g. Greet{ greeting: String })
                     // or will the variant be serialized correctly anyways?
-    Goodbye(String),
+    Goodbye{ goodbye: String },
 }
 
 

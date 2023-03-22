@@ -1,6 +1,7 @@
 use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary,
 };
+// use cw20::{Cw20ReceiveMsg};
 use crate::msg::*;
 use crate::state::USERS;
 
@@ -25,6 +26,36 @@ pub fn instantiate(
 }
 
 
+#[entry_point]
+pub fn execute(
+    _deps: DepsMut,
+    _env: Env,
+    _info: MessageInfo,
+    msg: ExecuteMsg,
+) -> StdResult<Response> {
+    
+    match msg {
+        ExecuteMsg::AddUser{username: un} => add_user(un),
+        ExecuteMsg::Leave{} => leave(),
+    }
+}
+
+
+
+pub fn add_user(_username: String) -> StdResult<Response> {
+
+    Ok(Response::new())
+}
+
+
+
+pub fn leave() -> StdResult<Response>{
+
+    Ok(Response::new())
+}
+
+
+
 
 #[entry_point]
 pub fn query(
@@ -34,8 +65,8 @@ pub fn query(
 ) -> StdResult<Binary> {
 
     match msg {
-        QueryMsg::Greet(grtng) => to_binary(&greet(grtng)?),
-        QueryMsg::Goodbye(gbye) => to_binary(&say_goodbye(gbye)?),        
+        QueryMsg::Greet{ greeting: grtng } => to_binary(&greet(grtng)?),
+        QueryMsg::Goodbye{ goodbye: gbye } => to_binary(&say_goodbye(gbye)?),        
     }
 }
 
