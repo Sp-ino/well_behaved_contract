@@ -24,6 +24,7 @@ pub enum QueryMsg {
                     // for the variant's content (e.g. Greet{ greeting: String })
                     // or will the variant be serialized correctly anyways?
     Goodbye{ goodbye: String },
+    ListUsers{ },
 }
 
 
