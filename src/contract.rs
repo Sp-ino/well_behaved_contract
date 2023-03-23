@@ -80,7 +80,7 @@ pub fn leave(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
 
 #[entry_point]
 pub fn query(
-    _deps: Deps,
+    deps: Deps,
     _env: Env,
     msg: QueryMsg,
 ) -> StdResult<Binary> {
@@ -88,7 +88,7 @@ pub fn query(
     match msg {
         QueryMsg::Greet{ greeting: grtng } => to_binary(&greet(grtng)?),
         QueryMsg::Goodbye{ goodbye: gbye } => to_binary(&say_goodbye(gbye)?),
-        QueryMsg::ListUsers{ } => to_binary(&list_users()?),
+        QueryMsg::ListUsers{ } => to_binary(&list_users(deps)?),
     }
 }
 
@@ -113,6 +113,12 @@ pub fn say_goodbye(gb: String)-> StdResult<GoodbyeResp> {
 }
 
 
-pub fn list_users() -> StdResult<Response> {
-    Ok(Response::new())
+pub fn list_users(deps: Deps) -> StdResult<UserListResp> {
+    let usrs = USERS.load(deps.storage)?;
+
+    let userlst = UserListResp {
+        user_list: usrs,
+    };
+
+    Ok(userlst)
 }
