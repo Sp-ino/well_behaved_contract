@@ -1,3 +1,4 @@
+use cosmwasm_std::Addr;
 use serde::{Serialize, Deserialize};
 
 // ------------------------Enums that represent messages-----------------------
@@ -22,19 +23,26 @@ pub enum QueryMsg {
     // entry point function
     Greet{ greeting: String }, // Better to use struct inside variant, even if it has only one field
     Goodbye{ goodbye: String },
+    ListUsers{ },
 }
 
 
 
 // ------------------------Structs that represent responses to queries--------
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct GreetResp {
     pub greeting: String,
 }
 
 
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct GoodbyeResp {
     pub goodbye: String,
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub struct UserListResp {
+    pub user_list: Vec<Addr>,
 }
