@@ -5,13 +5,15 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct InstantiateMsg {
     pub users: Vec<String>,
+    pub total_funds: String,
 }
 
 
 
 pub enum  ExecuteMsg {
     AddUser{ username: String },
-    Leave{},
+    Leave{ },
+    CollectFunds{ },
 }
 
 
@@ -24,6 +26,7 @@ pub enum QueryMsg {
     Greet{ greeting: String }, // question: do I have to use struct representation
                     // for the variant's content (e.g. Greet{ greeting: String })
                     // or will the variant be serialized correctly anyways?
+                    // Answer: better to use struct repr.
     Goodbye{ goodbye: String },
     ListUsers{ },
 }

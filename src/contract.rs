@@ -2,7 +2,7 @@ use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, StdError,
 };
 use crate::msg::*;
-use crate::state::USERS;
+use crate::state::{USERS, FUNDS};
 
 
 
@@ -20,7 +20,7 @@ pub fn instantiate(
                                     .map(|addr| deps.api.addr_validate(&addr))
                                     .collect();
     USERS.save(deps.storage, &users?)?;
-
+    FUNDS.save(deps.storage, &msg.total_funds)?;
     Ok(Response::new())
 }
 
@@ -34,8 +34,15 @@ pub fn execute(
 ) -> StdResult<Response> {
     match msg {
         ExecuteMsg::AddUser{username: un} => add_user(un, deps, info),
-        ExecuteMsg::Leave{} => leave(deps, info),
+        ExecuteMsg::Leave{  } => leave(deps, info),
+        ExecuteMsg::CollectFunds{  } => collect_funds(deps, info),
     }
+}
+
+
+pub fn collect_funds(deps: DepsMut, info: MessageInfo) -> StdResult<Response> { 
+
+    Ok(Response::new())
 }
 
 
