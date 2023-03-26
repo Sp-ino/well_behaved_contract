@@ -1,19 +1,25 @@
-use cosmwasm_std::Addr;
+use cosmwasm_std::{Addr, Uint128};
+use cw20::Cw20ReceiveMsg;
 use serde::{Serialize, Deserialize};
 
 // ------------------------Enums that represent messages-----------------------
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct InstantiateMsg {
-    pub users: Vec<String>,
-    pub total_funds: String,
+    pub admins: Vec<String>,
+    pub total_funds: Uint128,
+    pub coin_contract: String,
 }
 
 
-
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum  ExecuteMsg {
-    AddUser{ username: String },
+    AddAdmin{ admin_name: String },
     Leave{ },
-    CollectFunds{ },
+    ReceiveCw20(Cw20ReceiveMsg),
+    SendCw20{
+        amount: Uint128,    
+        to: Addr,
+    },
 }
 
 
@@ -25,7 +31,7 @@ pub enum QueryMsg {
     // entry point function
     Greet{ greeting: String }, // Better to use struct inside variant, even if it has only one field
     Goodbye{ goodbye: String },
-    ListUsers{ },
+    ListAdmins{ },
 }
 
 
@@ -45,6 +51,6 @@ pub struct GoodbyeResp {
 
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
-pub struct UserListResp {
-    pub user_list: Vec<Addr>,
+pub struct AdminListResp {
+    pub admin_list: Vec<Addr>,
 }
