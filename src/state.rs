@@ -1,10 +1,45 @@
-use cosmwasm_std::{Addr, Uint128};
-use cw_storage_plus::Item;
-// use serde::{Serialize, Deserialize};
-// use schemars::JsonSchema;
+use cosmwasm_std::{Addr, Uint128, Storage, StdResult};
+use cosmwasm_storage::{ReadonlySingleton, Singleton};
+use serde::{Serialize, Deserialize};
+
+const KEY_CONFIG: &[u8] = b"config";
+const KEY_STATE: &[u8] = b"state";
 
 
 
-pub const COIN_CONTRACT: Item<Addr> = Item::new("coin_contract");
-pub const ADMINS: Item<Vec<Addr>> = Item::new("users");
-pub const BALANCE: Item<Uint128> = Item::new("total_funds");
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub struct State {
+    pub admins: Vec<Addr>,
+    pub balance: Uint128,
+}
+
+
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub struct Config {
+    pub token_contract: Addr,
+}
+
+
+
+pub fn store_config(storage: &mut dyn Storage, data: &Config) -> StdResult<()> {
+    Singleton::new(storage, KEY_CONFIG).save(data)
+}
+
+
+
+pub fn read_config(storage: &dyn Storage) -> StdResult<Config> {
+    ReadonlySingleton::new(storage, KEY_CONFIG).load()
+}
+
+
+
+pub fn store_state(storage: &mut dyn Storage, data: &State) -> StdResult<()> {
+    Singleton::new(storage, KEY_STATE).save(data)
+}
+
+
+
+pub fn read_state(storage: &dyn Storage) -> StdResult<State> {
+    ReadonlySingleton::new(storage, KEY_STATE).load()
+}

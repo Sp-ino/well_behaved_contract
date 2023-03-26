@@ -13,6 +13,7 @@ cw-storage-plus = "0.13.4"
 cw20 = "0.13.4"
 thiserror = "1"
 schemars = "0.8.8"
+cosmwasm-storage = { version = "1.0.0", features = ["iterator"] }
 
 
 [dev-dependencies]

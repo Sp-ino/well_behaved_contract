@@ -3,7 +3,7 @@ use cosmwasm_std::{
     Response, StdResult, to_binary, Addr, CosmosMsg, WasmMsg, Uint128};
 use cw20::{Cw20ReceiveMsg, Cw20ExecuteMsg};
 use crate::msg::*;
-use crate::state::{ADMINS, BALANCE, COIN_CONTRACT};
+use crate::state::{State, Config, store_state, read_state, store_config, read_config};
 use crate::error::ContractError;
 
 
@@ -20,11 +20,18 @@ pub fn instantiate(
                                     .into_iter()
                                     .map(|addr| deps.api.addr_validate(&addr))
                                     .collect();
-    let coin_contract = deps.api.addr_validate(&msg.coin_contract);
+    let token_contract = deps.api.addr_validate(&msg.token_contract)?;
 
-    ADMINS.save(deps.storage, &admins?)?;
-    BALANCE.save(deps.storage, &msg.total_funds)?;
-    COIN_CONTRACT.save(deps.storage, &coin_contract?)?;
+    let state = State {
+        admins: admins?,
+        balance: msg.balance,
+    };
+    store_state(deps.storage, &state)?;
+
+    let config = Config {
+        token_contract: token_contract,
+    };
+    store_config(deps.storage, &config)?;
     
     Ok(Response::new())
 }
@@ -55,10 +62,10 @@ pub fn send_cw20(
 ) -> Result<Response, ContractError> {
 
     let msg_sender = info.sender;
-    let admins = ADMINS.load(deps.storage)?;
-    let coin_contract = COIN_CONTRACT.load(deps.storage)?;
+    let state = read_state(deps.storage)?;
+    let config = read_config(deps.storage)?;
 
-    if !admins.contains(&msg_sender) {
+    if !state.admins.contains(&msg_sender) {
         return Err(ContractError::NotRegistered { sender: msg_sender })
     }
 
@@ -107,7 +114,7 @@ pub fn send_cw20(
     let resp = Response::new()
                             .add_message(CosmosMsg::Wasm(
                                 WasmMsg::Execute {
-                                    contract_addr: coin_contract.to_string(),
+                                    contract_addr: config.token_contract.to_string(),
                                     msg: to_binary(&Cw20ExecuteMsg::Transfer {
                                         recipient: to.to_string(),
                                         amount: amount,
@@ -128,9 +135,9 @@ pub fn receive_cw20(
 
     let amount: Uint128 = cw20_receive_msg.amount.into();
 
-    let mut contract_balance = BALANCE.load(deps.storage)?;
-    contract_balance = contract_balance + amount;
-    BALANCE.save(deps.storage, &contract_balance)?;
+    let mut state = read_state(deps.storage)?;
+    state.balance = state.balance + amount;
+    store_state(deps.storage, &state)?;
 
     Ok(Response::new())
 }
@@ -138,15 +145,18 @@ pub fn receive_cw20(
 
 
 pub fn add_user(admin_name: String, deps: DepsMut, _info: MessageInfo) -> Result<Response, ContractError> {
-    let mut admins = ADMINS.load(deps.storage)?;
+    let mut state = read_state(deps.storage)?;
     let new_user_addr = deps.api.addr_validate(&admin_name)?;
 
-    if admins.contains(&new_user_addr) {
+    if state.admins.contains(&new_user_addr) {
         return Err(ContractError::AlreadyRegistered{ })
     }
 
-    admins.push(new_user_addr);
-    ADMINS.save(deps.storage, &admins)?;
+    state
+        .admins
+        .push(new_user_addr);
+
+    store_state(deps.storage, &state)?;
 
     Ok(Response::new())
 }
@@ -154,18 +164,21 @@ pub fn add_user(admin_name: String, deps: DepsMut, _info: MessageInfo) -> Result
 
 
 pub fn leave(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
-    let mut admins = ADMINS.load(deps.storage)?;
+    let mut state = read_state(deps.storage)?;
     let msg_sender = info.sender;
 
-    if !admins.contains(&msg_sender) {
+    if !state.admins.contains(&msg_sender) {
         return Err(ContractError::NotRegistered { sender: msg_sender })
     }
 
-    let user_idx = admins.iter()
-                                .position(|x| *x == msg_sender)
-                                .unwrap();
-    admins.remove(user_idx);
-    ADMINS.save(deps.storage, &admins)?;
+    let user_idx = state.admins.iter()
+                                    .position(|x| *x == msg_sender)
+                                    .unwrap();
+    state
+        .admins
+        .remove(user_idx);
+
+    store_state(deps.storage, &state)?;
 
     Ok(Response::new())
 }
@@ -209,10 +222,10 @@ pub fn say_goodbye(gb: String)-> StdResult<GoodbyeResp> {
 
 
 pub fn list_admins(deps: Deps) -> StdResult<AdminListResp> {
-    let admins = ADMINS.load(deps.storage)?;
+    let state = read_state(deps.storage)?;
 
     let admlist = AdminListResp {
-        admin_list: admins,
+        admin_list: state.admins,
     };
 
     Ok(admlist)

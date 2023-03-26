@@ -6,8 +6,8 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct InstantiateMsg {
     pub admins: Vec<String>,
-    pub total_funds: Uint128,
-    pub coin_contract: String,
+    pub balance: Uint128,
+    pub token_contract: String,
 }
 
 
