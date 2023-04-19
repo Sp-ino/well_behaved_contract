@@ -133,6 +133,22 @@ pub fn receive_cw20(
     cw20_receive_msg: Cw20ReceiveMsg
 ) -> Result<Response, ContractError> { 
 
+    // Actually, there is no need for a state variable that
+    // keeps track of the balance, as the contract can query its
+    // own balance.
+    // 
+    // --------------------IMPORTANT!!!!!------------------------
+    // When a smart contract handles a Cw20ReceiveMsg, its balance
+    // is not updated until the contract's execute function returns
+    // an Ok() value. Therefore, is the contract needs to know the
+    // updated balance, it must query its current balance and then
+    // add the quantity Cw20ReceiveMsg.amount to it.
+    // 
+    // It's also important that what is stated above DOES NOT APPLY
+    // TO NATIVE COIN TRANSFERS. For example, if an ExecuteMsg with
+    // non-empty funds field is received by the contract, its update
+    // balance will be available from the moment the execute() entry
+    // point is triggered.
     let amount: Uint128 = cw20_receive_msg.amount.into();
 
     let mut state = read_state(deps.storage)?;
